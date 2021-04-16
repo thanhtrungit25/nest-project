@@ -1,9 +1,10 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import PostgresErrorCode from '../database/postgresErrorCode.enum';
 import { UserService } from '../users/user.service';
 import RegisterDto from './dto/register.dto';
 
+@Injectable()
 export class AuthenticationService {
   constructor(private readonly usersService: UserService) {}
 
