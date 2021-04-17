@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import User from '../../users/user.entity';
-import { UserService } from '../../users/user.service';
+import { UserService } from '../../users/users.service';
 import { AuthenticationService } from '../authentication.service';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
