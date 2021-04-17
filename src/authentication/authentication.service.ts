@@ -3,14 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import PostgresErrorCode from '../database/postgresErrorCode.enum';
-import { UserService } from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import RegisterDto from './dto/register.dto';
 import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    private readonly usersService: UserService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
