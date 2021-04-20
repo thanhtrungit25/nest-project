@@ -29,7 +29,7 @@ describe('The AuthenticationService', () => {
         },
       ],
     }).compile();
-    authenticationService = module.get<AuthenticationService>(
+    authenticationService = await module.get<AuthenticationService>(
       AuthenticationService,
     );
   });

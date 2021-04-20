@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Address from './address.entity';
+import PublicFile from '../files/publicFile.entity';
 
 @Entity()
 class User {
@@ -33,7 +34,14 @@ class User {
   public address: Address;
 
   @OneToMany(() => Post, (post: Post) => post.author)
-  public posts: Post[];
+  public posts?: Post[];
+
+  @OneToOne(() => PublicFile, {
+    eager: true,
+    nullable: true,
+  })
+  @JoinColumn()
+  public avatar?: PublicFile;
 }
 
 export default User;
