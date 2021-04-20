@@ -22,6 +22,7 @@ import { CategoriesModule } from './categories/categories.module';
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
+        AWS_PRIVATE_BUCKET_NAME: Joi.string().required(),
       }),
     }),
     DatabaseModule,
