@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -24,7 +25,10 @@ export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getAllPosts() {
+  async getPosts(@Query('search') search: string) {
+    if (search) {
+      return this.postsService.searchForPosts(search);
+    }
     return this.postsService.getAllPosts();
   }
 
