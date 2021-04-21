@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import Post from './post.entity';
+import PostCountResult from './types/postCountBody.interface';
 import PostSearchBody from './types/postSearchBody.interface';
 import PostSearchResult from './types/postSearchResponse.interface';
 
@@ -22,7 +23,26 @@ export default class PostsSearchService {
     });
   }
 
-  async search(text: string, offset?: number, limit?: number) {
+  async count(query: string, fields: string[]) {
+    const { body } = await this.elasticSearchService.count<PostCountResult>({
+      index: this.index,
+      body: {
+        query: {
+          multi_match: {
+            query,
+            fields,
+          },
+        },
+      },
+    });
+    return body.count;
+  }
+
+  async search(text: string, offset?: number, limit?: number, startId = 0) {
+    let separateCount = 0;
+    if (startId) {
+      separateCount = await this.count(text, ['title', 'paragraphs']);
+    }
     try {
       const { body } = await this.elasticSearchService.search<PostSearchResult>(
         {
@@ -31,9 +51,20 @@ export default class PostsSearchService {
           size: limit,
           body: {
             query: {
-              multi_match: {
-                query: text,
-                fields: ['title', 'paragraphs'],
+              bool: {
+                should: {
+                  multi_match: {
+                    query: text,
+                    fields: ['title', 'paragraphs'],
+                  },
+                },
+                filter: {
+                  range: {
+                    id: {
+                      gt: startId,
+                    },
+                  },
+                },
               },
             },
             sort: {
@@ -48,7 +79,7 @@ export default class PostsSearchService {
       const hits = body.hits.hits;
       const results = hits.map((item) => item._source);
       return {
-        count,
+        count: startId ? separateCount : count,
         results,
       };
     } catch (error) {

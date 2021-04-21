@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import UpdatePostDto from './dto/updatePost.dto';
 import CreatePostDto from './dto/createPost.dto';
 import Post from './post.entity';
-import { In, Repository } from 'typeorm';
+import { FindManyOptions, In, MoreThan, Repository } from 'typeorm';
 import PostNotFoundException from './exception/postNotFound.exception';
 import User from '../users/user.entity';
 import PostsSearchService from './postsSearch.service';
@@ -17,7 +17,14 @@ export default class PostsService {
     private postsSearchService: PostsSearchService,
   ) {}
 
-  async getAllPosts(offset?: number, limit?: number) {
+  async getAllPosts(offset?: number, limit?: number, startId?: number) {
+    const where: FindManyOptions<Post>['where'] = {};
+    let separateCount = 0;
+    if (startId) {
+      where.id = MoreThan(startId);
+      separateCount = await this.postsRepository.count();
+    }
+
     const [items, count] = await this.postsRepository.findAndCount({
       relations: ['author'],
       order: {
@@ -28,7 +35,7 @@ export default class PostsService {
     });
     return {
       items,
-      count,
+      count: startId ? separateCount : count,
     };
   }
 
@@ -78,11 +85,13 @@ export default class PostsService {
     text: string,
     offset?: number,
     limit?: number,
+    startId?: number,
   ): Promise<PostSearchDataResult> {
     const { results, count } = await this.postsSearchService.search(
       text,
       offset,
       limit,
+      startId,
     );
     const ids = results.map((result) => result.id);
     if (!ids.length) {
