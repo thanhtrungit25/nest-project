@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilesService } from '../files/files.service';
 import { PrivateFileService } from '../privateFiles/privateFile.service';
-import { Repository } from 'typeorm';
+import { Repository, Connection } from 'typeorm';
 import CreateUserDto from './dto/createUser.dto';
 import User from './user.entity';
 
@@ -19,6 +19,7 @@ export class UsersService {
     private userRepository: Repository<User>,
     private readonly filesService: FilesService,
     private readonly privateFilesService: PrivateFileService,
+    private connection: Connection,
   ) {}
 
   async getByEmail(email: string) {
@@ -72,14 +73,30 @@ export class UsersService {
   }
 
   async deleteAvatar(userId: number) {
+    const queryRunner = this.connection.createQueryRunner();
+
     const user = await this.getById(userId);
     const fileId = user.avatar?.id;
     if (fileId) {
-      await this.userRepository.update(userId, {
-        ...user,
-        avatar: null,
-      });
-      await this.filesService.deletePublicFile(fileId);
+      // establish real database connection using our new query runner
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        await queryRunner.manager.update(User, userId, {
+          ...user,
+          avatar: null,
+        });
+        await this.filesService.deletePublicFileWithQueryRunner(
+          fileId,
+          queryRunner,
+        );
+        await queryRunner.commitTransaction();
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+      } finally {
+        await queryRunner.release();
+      }
     }
   }
 
