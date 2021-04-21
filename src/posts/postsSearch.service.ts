@@ -16,29 +16,41 @@ export default class PostsSearchService {
       body: {
         id: post.id,
         title: post.title,
-        content: post.content,
+        paragraphs: post.paragraphs,
         authorId: post.author.id,
       },
     });
   }
 
-  async search(text: string) {
+  async search(text: string, offset?: number, limit?: number) {
     try {
       const { body } = await this.elasticSearchService.search<PostSearchResult>(
         {
           index: this.index,
+          from: offset,
+          size: limit,
           body: {
             query: {
               multi_match: {
                 query: text,
-                fields: ['title', 'content'],
+                fields: ['title', 'paragraphs'],
+              },
+            },
+            sort: {
+              id: {
+                order: 'asc',
               },
             },
           },
         },
       );
+      const count = body.hits.total.value;
       const hits = body.hits.hits;
-      return hits.map((item) => item._source);
+      const results = hits.map((item) => item._source);
+      return {
+        count,
+        results,
+      };
     } catch (error) {
       console.error('error', JSON.stringify(error));
     }
@@ -61,7 +73,7 @@ export default class PostsSearchService {
     const newBody: PostSearchBody = {
       id: post.id,
       title: post.title,
-      content: post.content,
+      paragraphs: post.paragraphs,
       authorId: post.author.id,
     };
 

@@ -10,10 +10,10 @@ class UpdatePostDto {
   @IsOptional()
   title: string;
 
-  @IsString()
+  @IsString({ each: true })
   @IsNotEmpty()
   @IsOptional()
-  content: string;
+  paragraphs: string[];
 }
 
 export default UpdatePostDto;

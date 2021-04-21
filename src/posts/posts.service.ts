@@ -7,6 +7,7 @@ import { In, Repository } from 'typeorm';
 import PostNotFoundException from './exception/postNotFound.exception';
 import User from '../users/user.entity';
 import PostsSearchService from './postsSearch.service';
+import PostSearchDataResult from './types/postSearchDataResult';
 
 @Injectable()
 export default class PostsService {
@@ -16,8 +17,19 @@ export default class PostsService {
     private postsSearchService: PostsSearchService,
   ) {}
 
-  getAllPosts() {
-    return this.postsRepository.find();
+  async getAllPosts(offset?: number, limit?: number) {
+    const [items, count] = await this.postsRepository.findAndCount({
+      relations: ['author'],
+      order: {
+        id: 'ASC',
+      },
+      skip: offset,
+      take: limit,
+    });
+    return {
+      items,
+      count,
+    };
   }
 
   async getPostById(id: number) {
@@ -42,13 +54,15 @@ export default class PostsService {
     throw new PostNotFoundException(id);
   }
 
-  async createPost(post: CreatePostDto, user: User) {
+  async createPost(post: CreatePostDto, user: User, index: boolean) {
     const newPost = await this.postsRepository.create({
       ...post,
       author: user,
     });
     await this.postsRepository.save(newPost);
-    this.postsSearchService.indexPost(newPost);
+    if (index) {
+      this.postsSearchService.indexPost(newPost);
+    }
     return newPost;
   }
 
@@ -60,14 +74,29 @@ export default class PostsService {
     this.postsSearchService.remove(id);
   }
 
-  async searchForPosts(text: string) {
-    const results = await this.postsSearchService.search(text);
+  async searchForPosts(
+    text: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<PostSearchDataResult> {
+    const { results, count } = await this.postsSearchService.search(
+      text,
+      offset,
+      limit,
+    );
     const ids = results.map((result) => result.id);
     if (!ids.length) {
-      return [];
+      return {
+        items: [],
+        count,
+      };
     }
-    return this.postsRepository.find({
+    const items = await this.postsRepository.find({
       where: { id: In(ids) },
     });
+    return {
+      items,
+      count,
+    };
   }
 }

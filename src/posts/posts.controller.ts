@@ -18,6 +18,7 @@ import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import PostsService from './posts.service';
 import RequestWithUser from '../authentication/requestWithUser.interface';
+import { PaginationParams } from '../utils/types/paginationParams';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('posts')
@@ -25,11 +26,14 @@ export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async getPosts(@Query('search') search: string) {
+  async getPosts(
+    @Query('search') search: string,
+    @Query() { offset, limit }: PaginationParams,
+  ) {
     if (search) {
-      return this.postsService.searchForPosts(search);
+      return this.postsService.searchForPosts(search, offset, limit);
     }
-    return this.postsService.getAllPosts();
+    return this.postsService.getAllPosts(offset, limit);
   }
 
   @Get(':id')
@@ -40,8 +44,7 @@ export default class PostsController {
   @Post()
   @UseGuards(JwtAuthenticationGuard)
   createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
-    console.log('createPost', req.user);
-    return this.postsService.createPost(post, req.user);
+    return this.postsService.createPost(post, req.user, false);
   }
 
   @Patch(':id')
