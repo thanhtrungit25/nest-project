@@ -4,7 +4,7 @@
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
-  
+
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
     <p align="center">
 <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
@@ -30,6 +30,53 @@
 
 ```bash
 $ npm install
+```
+
+## Prepare
+
+#### Create file .env follow patterns
+
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=nestjs
+JWT_SECRET='i-love-cat'
+JWT_EXPIRATION_TIME=3600
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=[YOUR AWS ACCESS KEY]
+AWS_SECRET_ACCESS_KEY=[YOUR AWS SECRET KEY]
+AWS_PUBLIC_BUCKET_NAME=nestjs-tutorial-public-bucket
+AWS_PRIVATE_BUCKET_NAME=nestjs-tutorial-private-bucket
+ELASTICSEARCH_NODE=http://localhost:9200
+ELASTICSEARCH_USERNAME=elastic
+ELASTICSEARCH_PASSWORD=admin
+PORT=5000
+SUBSCRIBERS_SERVICE_HOST=localhost
+SUBSCRIBERS_SERVICE_PORT=6000
+RABBITMQ_USER=admin
+RABBITMQ_PASSWORD=admin
+RABBITMQ_HOST=localhost:5672
+RABBITMQ_QUEUE_NAME=email-subscribers
+
+#### Create file docker.env follow patterns
+
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=nestjs
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=admin
+ELASTIC_PASSWORD=admin
+
+#### Create file rabbitmq.env follow patterns
+
+RABBITMQ_DEFAULT_USER=admin
+RABBITMQ_DEFAULT_PASS=admin
+
+## Before Running the app
+
+```bash
+$ docker-compose up
 ```
 
 ## Running the app
@@ -70,4 +117,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## License
 
-  Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
