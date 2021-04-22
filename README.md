@@ -36,6 +36,7 @@ $ npm install
 
 #### Create file .env follow patterns
 
+```bash
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_USER=admin
@@ -58,20 +59,25 @@ RABBITMQ_USER=admin
 RABBITMQ_PASSWORD=admin
 RABBITMQ_HOST=localhost:5672
 RABBITMQ_QUEUE_NAME=email-subscribers
+```
 
 #### Create file docker.env follow patterns
 
+```bash
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
 POSTGRES_DB=nestjs
 PGADMIN_DEFAULT_EMAIL=admin@admin.com
 PGADMIN_DEFAULT_PASSWORD=admin
 ELASTIC_PASSWORD=admin
+```
 
 #### Create file rabbitmq.env follow patterns
 
+```bash
 RABBITMQ_DEFAULT_USER=admin
 RABBITMQ_DEFAULT_PASS=admin
+```
 
 ## Before Running the app
 
